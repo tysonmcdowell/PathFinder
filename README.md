@@ -2,7 +2,7 @@
 
 # PathFinder
 
-# Schema ![alt text](images/Screenshot%202025-02-18%20at%2011.30.21 AM.png)
+# Schema ![alt text](images/Screenshot%202025-02-20%20at%2011.00.43 AM.png)
 
 
 # Wireframe ![alt text](images/Screenshot%202025-02-18%20at%2011.40.50 AM.png)
