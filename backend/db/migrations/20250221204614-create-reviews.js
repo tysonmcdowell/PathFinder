@@ -1,7 +1,7 @@
 'use strict';
 
 let options = {};
-options.tableName = 'Users';
+options.tableName = 'Reviews';
 if (process.env.NODE_ENV === 'production') {
   options.schema = process.env.SCHEMA; // Define schema in production
 }
@@ -15,34 +15,38 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      firstName: {
-        type: Sequelize.STRING,
-        allowNull: false
-      },
-      lastName: {
-        type: Sequelize.STRING,
-        allowNull: false
-      },
-      username: {
-        type: Sequelize.STRING,
+      post_id: {
+        type: Sequelize.INTEGER,
         allowNull: false,
-        unique: true
+        references: {
+          model: 'Posts', // References the Posts table
+          key: 'id'
+        },
+        onDelete: 'CASCADE' // Delete reviews if the post is deleted
       },
-      hashedPassword: {
-        type: Sequelize.STRING, // Changed from STRING.BINARY to STRING
+      user_id: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        references: {
+          model: 'Users', // References the Users table
+          key: 'id'
+        },
+        onDelete: 'CASCADE' // Delete reviews if the user is deleted
+      },
+      rating: {
+        type: Sequelize.INTEGER,
         allowNull: false
       },
-      email: {
-        type: Sequelize.STRING,
-        allowNull: false,
-        unique: true
+      reviews: {
+        type: Sequelize.TEXT,
+        allowNull: false
       },
-      createdAt: {
+      created_at: {
         allowNull: false,
         type: Sequelize.DATE,
         defaultValue: Sequelize.literal('CURRENT_TIMESTAMP')
       },
-      updatedAt: {
+      updated_at: {
         allowNull: false,
         type: Sequelize.DATE,
         defaultValue: Sequelize.literal('CURRENT_TIMESTAMP')
