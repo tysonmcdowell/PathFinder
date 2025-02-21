@@ -10,7 +10,7 @@ if (process.env.NODE_ENV === 'production') {
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    return queryInterface.bulkInsert(options, [
+    return queryInterface.bulkInsert(options.tableName, [
       {
         post_id: 1, // Links to Demo-lition's post
         order: 1,
@@ -43,7 +43,7 @@ module.exports = {
 
   down: async (queryInterface, Sequelize) => {
     const Op = Sequelize.Op;
-    return queryInterface.bulkDelete(options.tableName, {
+    return queryInterface.bulkDelete(options, {
       post_id: { [Op.in]: [1, 2, 3] }
     }, {});
   }
