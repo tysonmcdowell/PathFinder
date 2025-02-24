@@ -1,3 +1,4 @@
+// frontend/src/components/LoginFormModal.jsx
 import { useState } from "react";
 import { thunkLogin } from "../../redux/session";
 import { useDispatch } from "react-redux";
@@ -13,6 +14,7 @@ function LoginFormModal() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    console.log('Submitting login:', { email, password });
 
     const serverResponse = await dispatch(
       thunkLogin({
@@ -22,15 +24,19 @@ function LoginFormModal() {
     );
 
     if (serverResponse) {
+      console.log('Login failed:', serverResponse);
       setErrors(serverResponse);
     } else {
+      console.log('Login succeeded, closing modal');
       closeModal();
+      console.log('Modal closed');
     }
   };
 
   return (
     <>
       <h1>Log In</h1>
+      {errors.message && <p style={{ color: 'red' }}>{errors.message}</p>}
       <form onSubmit={handleSubmit}>
         <label>
           Email

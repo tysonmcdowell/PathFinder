@@ -1,20 +1,18 @@
+// backend/db/models/post.js
 'use strict';
 const { Model } = require('sequelize');
 
 module.exports = (sequelize, DataTypes) => {
   class Post extends Model {
     static associate(models) {
-      // Post belongs to User
       Post.belongsTo(models.User, {
-        foreignKey: 'ownerId',
+        foreignKey: 'owner_id', // Changed to owner_id
         as: 'owner'
       });
-      // Post has many Stops
       Post.hasMany(models.Stop, {
         foreignKey: 'post_id',
         as: 'stops'
       });
-      // Post has many Reviews
       Post.hasMany(models.Review, {
         foreignKey: 'post_id',
         as: 'reviews'
@@ -23,7 +21,7 @@ module.exports = (sequelize, DataTypes) => {
   }
 
   Post.init({
-    ownerId: {
+    owner_id: { // Changed to owner_id
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {

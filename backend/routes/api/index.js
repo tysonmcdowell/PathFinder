@@ -1,24 +1,18 @@
+// backend/routes/api/index.js
 const router = require('express').Router();
-const { restoreUser, requireAuth, setTokenCookie } = require('../../utils/auth.js');
-const { User } = require('../../db/models/index.js');
+const { restoreUser, setTokenCookie } = require('../../utils/auth.js');
 const sessionRouter = require('./session.js');
 const usersRouter = require('./users.js');
-
-
-//You can use requireAuth as middleware for routes that require sign in
-//You can use setTokenCookie as a func to set cookie for user
+const postsRouter = require('./posts.js');
 
 router.use(restoreUser);
 
 router.use('/session', sessionRouter);
 router.use('/users', usersRouter);
+router.use('/posts', postsRouter);
 
-
-// Restore user
-router.get('/restore-user', (req, res) => {
-    return res.json(req.user);
+router.post('/test', (req, res) => {
+  res.json({ requestBody: req.body });
 });
-
-
 
 module.exports = router;

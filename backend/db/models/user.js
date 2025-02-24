@@ -1,15 +1,14 @@
+// backend/db/models/user.js
 'use strict';
 const { Model, Validator } = require('sequelize');
 
 module.exports = (sequelize, DataTypes) => {
   class User extends Model {
     static associate(models) {
-      // User has many Posts
       User.hasMany(models.Post, {
-        foreignKey: 'ownerId',
+        foreignKey: 'owner_id', // Changed to owner_id
         as: 'posts'
       });
-      // User has many Reviews
       User.hasMany(models.Review, {
         foreignKey: 'user_id',
         as: 'reviews'

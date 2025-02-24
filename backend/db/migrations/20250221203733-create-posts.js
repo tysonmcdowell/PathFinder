@@ -15,7 +15,7 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      ownerId: {
+      owner_id: {
         type: Sequelize.INTEGER,
         allowNull: false,
         references: {
