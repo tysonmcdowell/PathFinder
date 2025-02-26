@@ -1,3 +1,4 @@
+// backend/db/migrations/YYYYMMDDHHMMSS-create-posts.js (your original migration file)
 'use strict';
 
 let options = {};
@@ -31,6 +32,10 @@ module.exports = {
       status: {
         type: Sequelize.STRING,
         allowNull: false
+      },
+      trip_length: { // New column
+        type: Sequelize.INTEGER,
+        allowNull: true
       },
       created_at: {
         allowNull: false,

@@ -1,3 +1,4 @@
+// backend/db/migrations/YYYYMMDDHHMMSS-create-stops.js (your original migration file)
 'use strict';
 
 let options = {};
@@ -19,10 +20,10 @@ module.exports = {
         type: Sequelize.INTEGER,
         allowNull: false,
         references: {
-          model: 'Posts', // References the Posts table
+          model: 'Posts',
           key: 'id'
         },
-        onDelete: 'CASCADE' // Delete stops if the post is deleted
+        onDelete: 'CASCADE'
       },
       order: {
         type: Sequelize.INTEGER,
@@ -38,7 +39,11 @@ module.exports = {
       },
       description: {
         type: Sequelize.TEXT,
-        allowNull: true // Optional as per note
+        allowNull: true
+      },
+      days: { // New column
+        type: Sequelize.INTEGER,
+        allowNull: true
       },
       created_at: {
         allowNull: false,

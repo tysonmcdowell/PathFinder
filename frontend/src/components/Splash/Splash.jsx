@@ -1,7 +1,7 @@
 // frontend/src/components/Splash.jsx
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { useSelector } from 'react-redux'; // Added for user state
+import { useSelector } from 'react-redux';
 
 const Splash = () => {
   const [posts, setPosts] = useState([]);
@@ -43,19 +43,43 @@ const Splash = () => {
   if (loading) return <div>Loading...</div>;
   if (error) return <div style={{ color: 'red' }}>Error: {error}</div>;
 
+  // Split posts if logged in
+  const myPosts = user ? posts.filter(post => post.owner_id === user.id) : [];
+  const othersPosts = user ? posts.filter(post => post.owner_id !== user.id) : posts;
+
   return (
     <div>
       <h1>Welcome To PathFinder</h1>
-      {user && ( // Only show "Create a New Trip" if logged in
+      {user && (
         <Link to="/create-trip">Create a New Trip</Link>
       )}
-      {posts.length > 0 ? (
+
+      {user && (
+        <>
+          <h2>My Posts</h2>
+          {myPosts.length > 0 ? (
+            <ul>
+              {myPosts.map(post => (
+                <li key={post.id}>
+                  <Link to={`/trips/${post.id}`}>
+                    {post.body} - {post.status} (by {post.owner?.username || 'Unknown'})
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p>You haven’t created any trips yet.</p>
+          )}
+        </>
+      )}
+
+      <h2>{user ? "Others' Posts" : "All Trips"}</h2>
+      {othersPosts.length > 0 ? (
         <ul>
-          {posts.map(post => (
+          {othersPosts.map(post => (
             <li key={post.id}>
               <Link to={`/trips/${post.id}`}>
-                {post.body} - {post.status} (by {post.owner?.username || 'Unknown'}) - 
-                {post.numReviews} Reviews, Avg Rating: {post.avgRating}
+                {post.body} - {post.status} (by {post.owner?.username || 'Unknown'})
               </Link>
             </li>
           ))}

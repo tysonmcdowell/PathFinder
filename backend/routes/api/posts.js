@@ -16,6 +16,22 @@ const validatePost = [
     .exists({ checkFalsy: true })
     .isIn(['planned', 'completed', 'in_progress'])
     .withMessage('Status must be one of: planned, completed, in_progress'),
+  check('tripLength')
+    .optional()
+    .isInt({ min: 1 })
+    .withMessage('Trip length must be an integer greater than or equal to 1'),
+  handleValidationErrors
+];
+
+const validateReview = [
+  check('rating')
+    .exists({ checkFalsy: true })
+    .isInt({ min: 1, max: 5 })
+    .withMessage('Rating must be an integer from 1 to 5'),
+  check('reviews')
+    .exists({ checkFalsy: true })
+    .notEmpty()
+    .withMessage('Review text is required'),
   handleValidationErrors
 ];
 
@@ -24,7 +40,11 @@ router.get('/', async (req, res) => {
   try {
     console.log('Fetching all posts');
     const posts = await Post.findAll({
-      attributes: ['id', 'owner_id', 'body', 'status', 'created_at', 'updated_at']
+      attributes: ['id', 'owner_id', 'body', 'status', 'trip_length', 'created_at', 'updated_at'],
+      include: [
+        { model: Stop, as: 'stops', attributes: ['id', 'order', 'name', 'location', 'days'] },
+        { model: Review, as: 'reviews', attributes: ['id', 'user_id', 'rating', 'reviews'], include: [{ model: User, as: 'reviewer', attributes: ['username'] }] }
+      ]
     });
     console.log('Posts fetched:', posts.map(p => p.toJSON()));
     return res.json({ Posts: posts });
@@ -36,11 +56,13 @@ router.get('/', async (req, res) => {
 
 // Create a new trip post
 router.post('/', requireAuth, validatePost, async (req, res) => {
-  const { body, status } = req.body;
+  const { body, status, tripLength, stops } = req.body;
   const owner_id = req.user.id;
 
   try {
     console.log('req.user:', req.user);
+    console.log('req.body:', req.body);
+    console.log('Received tripLength:', tripLength);
     console.log('Creating post with owner_id:', owner_id);
     if (!owner_id) throw new Error('User ID is not available from req.user');
     
@@ -48,19 +70,47 @@ router.post('/', requireAuth, validatePost, async (req, res) => {
       owner_id,
       body,
       status,
+      trip_length: tripLength ? parseInt(tripLength) : null,
       created_at: new Date(),
       updated_at: new Date()
     };
     console.log('Post data before create:', postData);
     
     const post = await Post.create(postData);
+    console.log('Post saved to DB:', post.toJSON());
+    
+    if (stops && Array.isArray(stops)) {
+      const stopData = stops.map(stop => ({
+        post_id: post.id,
+        order: stop.order,
+        name: stop.name,
+        location: stop.location,
+        description: stop.description || null,
+        days: stop.days || null
+      }));
+      console.log('Stop data before create:', stopData);
+      await Stop.bulkCreate(stopData, { validate: true });
+      console.log('Stops created:', stopData);
+    } else {
+      console.log('No stops provided or stops is not an array');
+    }
+
     const createdPost = await Post.findByPk(post.id, {
-      attributes: ['id', 'owner_id', 'body', 'status', 'created_at', 'updated_at']
+      attributes: ['id', 'owner_id', 'body', 'status', 'trip_length', 'created_at', 'updated_at'],
+      include: [
+        { model: Stop, as: 'stops', attributes: ['id', 'order', 'name', 'location', 'days'] },
+        { model: Review, as: 'reviews', attributes: ['id', 'user_id', 'rating', 'reviews'], include: [{ model: User, as: 'reviewer', attributes: ['username'] }] }
+      ]
     });
     console.log('Post created:', createdPost.toJSON());
     return res.status(201).json(createdPost);
   } catch (err) {
     console.error('Error creating post:', err);
+    if (err.name === 'SequelizeValidationError') {
+      const errors = err.errors.map(e => ({ field: e.path, message: e.message }));
+      console.log('Validation errors:', errors);
+      return res.status(400).json({ title: 'Validation Error', errors });
+    }
     return res.status(500).json({ title: 'Server Error', message: err.message, stack: err.stack });
   }
 });
@@ -71,7 +121,11 @@ router.get('/:postId', async (req, res) => {
   try {
     console.log(`Fetching post with ID: ${postId}`);
     const post = await Post.findByPk(postId, {
-      attributes: ['id', 'owner_id', 'body', 'status', 'created_at', 'updated_at']
+      attributes: ['id', 'owner_id', 'body', 'status', 'trip_length', 'created_at', 'updated_at'],
+      include: [
+        { model: Stop, as: 'stops', attributes: ['id', 'order', 'name', 'location', 'days'] },
+        { model: Review, as: 'reviews', attributes: ['id', 'user_id', 'rating', 'reviews'], include: [{ model: User, as: 'reviewer', attributes: ['username'] }] }
+      ]
     });
     if (!post) {
       console.log(`Post ${postId} not found`);
@@ -85,15 +139,133 @@ router.get('/:postId', async (req, res) => {
   }
 });
 
+// Create a review for a post
+router.post('/:postId/reviews', requireAuth, validateReview, async (req, res) => {
+  const { postId } = req.params;
+  const { rating, reviews } = req.body;
+  const userId = req.user.id;
+
+  try {
+    console.log(`Creating review for post ${postId} by user ${userId}`);
+    const post = await Post.findByPk(postId);
+    if (!post) {
+      console.log(`Post ${postId} not found`);
+      return res.status(404).json({ message: 'Trip not found' });
+    }
+
+    const existingReview = await Review.findOne({
+      where: { post_id: postId, user_id: userId }
+    });
+    if (existingReview) {
+      console.log(`User ${userId} already reviewed post ${postId}`);
+      return res.status(403).json({ message: 'You have already reviewed this trip' });
+    }
+
+    const reviewData = {
+      post_id: postId,
+      user_id: userId,
+      rating,
+      reviews,
+      created_at: new Date(),
+      updated_at: new Date()
+    };
+    console.log('Review data before create:', reviewData);
+    
+    const newReview = await Review.create(reviewData);
+    console.log('Review created:', newReview.toJSON());
+
+    return res.status(201).json(newReview);
+  } catch (err) {
+    console.error('Error creating review:', err);
+    if (err.name === 'SequelizeValidationError') {
+      const errors = err.errors.map(e => ({ field: e.path, message: e.message }));
+      console.log('Validation errors:', errors);
+      return res.status(400).json({ title: 'Validation Error', errors });
+    }
+    return res.status(500).json({ title: 'Server Error', message: err.message, stack: err.stack });
+  }
+});
+
+// Edit a review for a post
+router.put('/:postId/reviews/:reviewId', requireAuth, validateReview, async (req, res) => {
+  const { postId, reviewId } = req.params;
+  const { rating, reviews } = req.body;
+  const userId = req.user.id;
+
+  try {
+    console.log(`Editing review ${reviewId} for post ${postId} by user ${userId}`);
+    const review = await Review.findByPk(reviewId);
+    if (!review) {
+      console.log(`Review ${reviewId} not found`);
+      return res.status(404).json({ message: 'Review not found' });
+    }
+    if (review.post_id !== parseInt(postId)) {
+      console.log(`Review ${reviewId} does not belong to post ${postId}`);
+      return res.status(404).json({ message: 'Review not found for this trip' });
+    }
+    if (review.user_id !== userId) {
+      console.log(`User ${userId} not authorized to edit review ${reviewId} owned by ${review.user_id}`);
+      return res.status(403).json({ message: 'You are not authorized to edit this review' });
+    }
+
+    await review.update({
+      rating,
+      reviews,
+      updated_at: new Date()
+    });
+    console.log('Review updated:', review.toJSON());
+    return res.json(review);
+  } catch (err) {
+    console.error('Error updating review:', err);
+    if (err.name === 'SequelizeValidationError') {
+      const errors = err.errors.map(e => ({ field: e.path, message: e.message }));
+      console.log('Validation errors:', errors);
+      return res.status(400).json({ title: 'Validation Error', errors });
+    }
+    return res.status(500).json({ title: 'Server Error', message: err.message, stack: err.stack });
+  }
+});
+
+// Delete a review for a post
+router.delete('/:postId/reviews/:reviewId', requireAuth, async (req, res) => {
+  const { postId, reviewId } = req.params;
+  const userId = req.user.id;
+
+  try {
+    console.log(`Deleting review ${reviewId} for post ${postId} by user ${userId}`);
+    const review = await Review.findByPk(reviewId);
+    if (!review) {
+      console.log(`Review ${reviewId} not found`);
+      return res.status(404).json({ message: 'Review not found' });
+    }
+    if (review.post_id !== parseInt(postId)) {
+      console.log(`Review ${reviewId} does not belong to post ${postId}`);
+      return res.status(404).json({ message: 'Review not found for this trip' });
+    }
+    if (review.user_id !== userId) {
+      console.log(`User ${userId} not authorized to delete review ${reviewId} owned by ${review.user_id}`);
+      return res.status(403).json({ message: 'You are not authorized to delete this review' });
+    }
+
+    await review.destroy();
+    console.log(`Review ${reviewId} deleted successfully`);
+    return res.status(200).json({ message: 'Successfully deleted' });
+  } catch (err) {
+    console.error('Error deleting review:', err);
+    return res.status(500).json({ title: 'Server Error', message: err.message, stack: err.stack });
+  }
+});
+
 // Edit a trip post
 router.put('/:postId', requireAuth, validatePost, async (req, res) => {
   const { postId } = req.params;
-  const { body, status } = req.body;
+  const { body, status, tripLength, stops } = req.body;
   const userId = req.user.id;
 
   try {
     console.log(`Editing post ${postId} by user ${userId}`);
     console.log('req.user:', req.user);
+    console.log('Received tripLength:', tripLength);
     const post = await Post.findByPk(postId);
     if (!post) {
       console.log(`Post ${postId} not found`);
@@ -105,9 +277,36 @@ router.put('/:postId', requireAuth, validatePost, async (req, res) => {
       return res.status(403).json({ message: 'You are not authorized to edit this trip' });
     }
 
-    await post.update({ body, status, updated_at: new Date() });
+    await post.update({ 
+      body, 
+      status, 
+      trip_length: tripLength ? parseInt(tripLength) : null, 
+      updated_at: new Date() 
+    });
+    console.log('Post updated in DB:', post.toJSON());
+
+    if (stops && Array.isArray(stops)) {
+      await Stop.destroy({ where: { post_id: postId } });
+      console.log(`Deleted existing stops for post ${postId}`);
+
+      const stopData = stops.map(stop => ({
+        post_id: post.id,
+        order: stop.order,
+        name: stop.name,
+        location: stop.location,
+        description: stop.description || null,
+        days: stop.days || null
+      }));
+      await Stop.bulkCreate(stopData, { validate: true });
+      console.log('Stops updated:', stopData);
+    }
+
     const updatedPost = await Post.findByPk(postId, {
-      attributes: ['id', 'owner_id', 'body', 'status', 'created_at', 'updated_at']
+      attributes: ['id', 'owner_id', 'body', 'status', 'trip_length', 'created_at', 'updated_at'],
+      include: [
+        { model: Stop, as: 'stops', attributes: ['id', 'order', 'name', 'location', 'days'] },
+        { model: Review, as: 'reviews', attributes: ['id', 'user_id', 'rating', 'reviews'], include: [{ model: User, as: 'reviewer', attributes: ['username'] }] }
+      ]
     });
     console.log('Post updated:', updatedPost.toJSON());
     return res.json(updatedPost);
