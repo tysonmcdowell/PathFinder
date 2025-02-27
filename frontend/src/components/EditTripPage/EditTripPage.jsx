@@ -1,4 +1,3 @@
-// frontend/src/components/EditTripPage/EditTripPage.jsx
 import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { csrfFetch } from '../../redux/csrf';

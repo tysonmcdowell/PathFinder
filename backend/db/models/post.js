@@ -1,4 +1,3 @@
-// backend/db/models/post.js
 'use strict';
 const { Model } = require('sequelize');
 
@@ -46,7 +45,7 @@ module.exports = (sequelize, DataTypes) => {
         }
       }
     },
-    trip_length: { // Added field
+    trip_length: { 
       type: DataTypes.INTEGER,
       allowNull: true,
       validate: {

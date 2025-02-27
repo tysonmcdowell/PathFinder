@@ -3,7 +3,7 @@
 let options = {};
 options.tableName = 'Reviews';
 if (process.env.NODE_ENV === 'production') {
-  options.schema = process.env.SCHEMA; // Define schema in production
+  options.schema = process.env.SCHEMA;
 }
 
 module.exports = {
@@ -19,19 +19,19 @@ module.exports = {
         type: Sequelize.INTEGER,
         allowNull: false,
         references: {
-          model: 'Posts', // References the Posts table
+          model: 'Posts',
           key: 'id'
         },
-        onDelete: 'CASCADE' // Delete reviews if the post is deleted
+        onDelete: 'CASCADE'
       },
       user_id: {
         type: Sequelize.INTEGER,
         allowNull: false,
         references: {
-          model: 'Users', // References the Users table
+          model: 'Users',
           key: 'id'
         },
-        onDelete: 'CASCADE' // Delete reviews if the user is deleted
+        onDelete: 'CASCADE'
       },
       rating: {
         type: Sequelize.INTEGER,

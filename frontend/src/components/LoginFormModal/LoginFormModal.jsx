@@ -1,4 +1,3 @@
-// frontend/src/components/LoginFormModal.jsx
 import { useState } from "react";
 import { thunkLogin } from "../../redux/session";
 import { useDispatch } from "react-redux";

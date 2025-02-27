@@ -3,7 +3,7 @@
 let options = {};
 options.tableName = 'Users';
 if (process.env.NODE_ENV === 'production') {
-  options.schema = process.env.SCHEMA; // Define schema in production
+  options.schema = process.env.SCHEMA;
 }
 
 module.exports = {
@@ -29,7 +29,7 @@ module.exports = {
         unique: true
       },
       hashedPassword: {
-        type: Sequelize.STRING, // Changed from STRING.BINARY to STRING
+        type: Sequelize.STRING,
         allowNull: false
       },
       email: {

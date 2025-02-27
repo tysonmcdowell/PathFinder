@@ -1,4 +1,3 @@
-// frontend/src/components/SignupFormModal.jsx
 import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { useModal } from "../../context/Modal";

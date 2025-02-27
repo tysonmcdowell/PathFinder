@@ -1,4 +1,3 @@
-// frontend/src/redux/posts.js
 import { csrfFetch } from "./csrf";
 
 const LOAD_POSTS = 'posts/loadPosts';
@@ -22,7 +21,7 @@ export const loadPostsThunk = () => async (dispatch) => {
 };
 
 export const createPostThunk = (postData) => async (dispatch) => {
-    console.log('Thunk received postData:', postData); // Debug log
+    console.log('Thunk received postData:', postData); 
     const response = await csrfFetch('/api/posts', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },

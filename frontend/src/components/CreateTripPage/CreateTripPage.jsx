@@ -1,4 +1,3 @@
-// frontend/src/components/CreateTripPage/CreateTripPage.jsx
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';

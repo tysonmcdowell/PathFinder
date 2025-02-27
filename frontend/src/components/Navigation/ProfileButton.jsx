@@ -1,4 +1,3 @@
-// frontend/src/components/ProfileButton.jsx
 import { useState, useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { thunkLogout } from "../../redux/session";
@@ -38,7 +37,6 @@ function ProfileButton() {
     closeMenu();
   };
 
-  // Callback to close menu after login/signup
   const handleModalClose = () => {
     closeMenu();
   };
@@ -63,13 +61,13 @@ function ProfileButton() {
               <OpenModalMenuItem
                 itemText="Log In"
                 onItemClick={closeMenu}
-                onModalClose={handleModalClose} // Pass callback
+                onModalClose={handleModalClose} 
                 modalComponent={<LoginFormModal />}
               />
               <OpenModalMenuItem
                 itemText="Sign Up"
                 onItemClick={closeMenu}
-                onModalClose={handleModalClose} // Pass callback
+                onModalClose={handleModalClose}
                 modalComponent={<SignupFormModal />}
               />
             </>

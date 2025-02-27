@@ -1,4 +1,3 @@
-// frontend/src/redux/csrf.js
 let csrfToken = null; // Store token in memory
 
 export async function csrfFetch(url, options = {}) {

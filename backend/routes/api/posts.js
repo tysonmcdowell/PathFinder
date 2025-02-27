@@ -1,4 +1,3 @@
-// backend/routes/api/posts.js
 const express = require('express');
 const { check } = require('express-validator');
 const { handleValidationErrors } = require('../../utils/validation');
@@ -88,7 +87,7 @@ router.post('/', requireAuth, validatePost, async (req, res) => {
     if (stops && Array.isArray(stops)) {
       const stopData = stops.map((stop, index) => ({
         post_id: post.id,
-        order: stop.order !== undefined ? stop.order : index + 1, // Fallback to index-based order
+        order: stop.order !== undefined ? stop.order : index + 1, 
         name: stop.name || 'Unnamed Stop',
         location: stop.location || 'Unknown Location',
         description: stop.description || null,
@@ -300,7 +299,7 @@ router.put('/:postId', requireAuth, validatePost, async (req, res) => {
 
       const stopData = stops.map((stop, index) => ({
         post_id: post.id,
-        order: stop.order !== undefined ? stop.order : index + 1, // Fallback order
+        order: stop.order !== undefined ? stop.order : index + 1, 
         name: stop.name || 'Unnamed Stop',
         location: stop.location || 'Unknown Location',
         description: stop.description || null,

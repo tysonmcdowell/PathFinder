@@ -11,7 +11,6 @@ const Splash = () => {
   const [tripImages, setTripImages] = useState({});
   const user = useSelector(state => state.session.user);
 
-  // Replace with your Google Maps API key
   const GOOGLE_MAPS_API_KEY = 'YOUR_GOOGLE_MAPS_API_KEY_HERE';
 
   useEffect(() => {
@@ -36,13 +35,12 @@ const Splash = () => {
         const fetchedPosts = data.Posts || [];
         setPosts(fetchedPosts);
 
-        // Fetch images for each post
         const images = {};
         await Promise.all(fetchedPosts.map(async (post) => {
           const stops = post.stops || [];
           if (stops.length > 0) {
             const imageUrl = await fetchPlacePhoto(stops);
-            images[post.id] = imageUrl || 'https://via.placeholder.com/250x250?text=No+Image'; // Fallback
+            images[post.id] = imageUrl || 'https://via.placeholder.com/250x250?text=No+Image'; 
           } else {
             images[post.id] = 'https://via.placeholder.com/250x250?text=No+Stops';
           }
@@ -67,7 +65,6 @@ const Splash = () => {
 
     const placesService = new window.google.maps.places.PlacesService(document.createElement('div'));
 
-    // Shuffle stops to pick a random one first
     const shuffledStops = [...stops].sort(() => 0.5 - Math.random());
 
     for (const stop of shuffledStops) {
@@ -98,7 +95,7 @@ const Splash = () => {
         console.error(`Error fetching photo for ${stop.location}:`, err);
       }
     }
-    return null; // No image found after trying all stops
+    return null;
   };
 
   if (loading) return <div>Loading...</div>;

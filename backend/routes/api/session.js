@@ -1,4 +1,3 @@
-// backend/routes/api/session.js
 const express = require('express');
 const { Op } = require('sequelize');
 const bcrypt = require('bcryptjs');
@@ -42,8 +41,8 @@ router.post('/', validateLogin, async (req, res, next) => {
 
   const safeUser = {
     id: user.id,
-    firstName: user.firstName, // Added from previous project
-    lastName: user.lastName,   // Added from previous project
+    firstName: user.firstName, 
+    lastName: user.lastName,  
     email: user.email,
     username: user.username,
   };
@@ -64,8 +63,8 @@ router.get('/', (req, res) => {
   if (user) {
     const safeUser = {
       id: user.id,
-      firstName: user.firstName, // Added
-      lastName: user.lastName,   // Added
+      firstName: user.firstName, 
+      lastName: user.lastName, 
       email: user.email,
       username: user.username,
     };

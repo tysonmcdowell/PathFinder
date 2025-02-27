@@ -1,4 +1,3 @@
-// backend/db/seeders/YYYYMMDDHHMMSS-seed-stops.js
 'use strict';
 
 const { Stop } = require('../models');
@@ -28,7 +27,7 @@ module.exports = {
         name: 'San Diego Zoo',
         location: 'San Diego, CA',
         description: 'Exploring one of the best zoos in the country.',
-        days: 4, // Total 7 days matches Post 1 trip_length
+        days: 4, 
         created_at: new Date(),
         updated_at: new Date()
       },
@@ -48,7 +47,7 @@ module.exports = {
         name: 'Great Sand Dunes National Park',
         location: 'Mosca, CO',
         description: 'Camping among towering sand dunes.',
-        days: 3, // Total 5 days matches Post 2 trip_length
+        days: 3,
         created_at: new Date(),
         updated_at: new Date()
       },
@@ -68,7 +67,7 @@ module.exports = {
         name: 'Pike Place Market',
         location: 'Seattle, WA',
         description: 'Visiting the famous market and local artisans.',
-        days: 2, // Total 3 days matches Post 3 trip_length
+        days: 2, 
         created_at: new Date(),
         updated_at: new Date()
       }

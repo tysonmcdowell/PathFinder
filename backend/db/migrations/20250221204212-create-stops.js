@@ -1,4 +1,3 @@
-// backend/db/migrations/YYYYMMDDHHMMSS-create-stops.js
 'use strict';
 
 let options = {};

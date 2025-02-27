@@ -1,4 +1,3 @@
-// backend/db/migrations/YYYYMMDDHHMMSS-create-posts.js
 'use strict';
 
 let options = {};

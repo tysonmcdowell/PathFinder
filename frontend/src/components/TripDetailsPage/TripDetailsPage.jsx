@@ -1,4 +1,3 @@
-// frontend/src/components/TripDetailsPage/TripDetailsPage.jsx
 import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
@@ -150,12 +149,10 @@ function TripDetailsPage() {
       Promise.all(geocodePromises).then((geocodedStops) => {
         const validStops = geocodedStops.filter((stop) => stop !== null);
 
-        // Adjust markers if start and end are the same
         if (isSameStartEnd) {
-          // Only show the last stop number for the combined start/end
           const combinedStop = {
-            ...validStops[0], // Use start's data
-            order: validStops.length, // Last stop number
+            ...validStops[0], 
+            order: validStops.length, 
           };
           const marker = new window.google.maps.Marker({
             position: combinedStop.location,
@@ -165,7 +162,6 @@ function TripDetailsPage() {
           });
           markersRef.current.push(marker);
 
-          // Add markers for intermediate stops (if any)
           validStops.slice(1, -1).forEach((stop) => {
             const marker = new window.google.maps.Marker({
               position: stop.location,
@@ -176,7 +172,6 @@ function TripDetailsPage() {
             markersRef.current.push(marker);
           });
         } else {
-          // Normal case: show all stops
           validStops.forEach((stop) => {
             const marker = new window.google.maps.Marker({
               position: stop.location,

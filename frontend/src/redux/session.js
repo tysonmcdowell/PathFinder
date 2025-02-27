@@ -1,4 +1,3 @@
-// frontend/src/redux/session.js
 import { csrfFetch } from './csrf';
 
 // Constants
@@ -17,7 +16,7 @@ const removeUser = () => ({
 export const thunkAuthenticate = () => async (dispatch) => {
   try {
     console.log('Authenticating user via /api/session');
-    const response = await csrfFetch("/api/session"); // Changed to /api/session
+    const response = await csrfFetch("/api/session"); 
     if (response.ok) {
       const data = await response.json();
       console.log('Authenticated user:', data);

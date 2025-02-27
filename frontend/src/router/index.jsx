@@ -3,9 +3,9 @@ import LoginFormPage from '../components/LoginFormPage';
 import SignupFormPage from '../components/SignupFormPage';
 import Layout from './Layout';
 import Splash from '../components/Splash';
-import CreateTripPage from '../components/CreateTripPage'; // New
-import TripDetailsPage from '../components/TripDetailsPage'; // New
-import EditTripPage from '../components/EditTripPage'; // New
+import CreateTripPage from '../components/CreateTripPage'; 
+import TripDetailsPage from '../components/TripDetailsPage'; 
+import EditTripPage from '../components/EditTripPage'; 
 
 export const router = createBrowserRouter([
   {

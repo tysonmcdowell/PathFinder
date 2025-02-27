@@ -1,4 +1,3 @@
-// backend/db/models/stop.js
 'use strict';
 const { Model } = require('sequelize');
 
