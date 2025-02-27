@@ -396,7 +396,6 @@ function TripDetailsPage() {
     } catch (err) {
       console.error('Edit review error:', err);
       setError(err.message);
-      
     }
   };
 
