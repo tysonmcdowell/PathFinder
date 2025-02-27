@@ -362,4 +362,5 @@ router.delete('/:postId', requireAuth, async (req, res) => {
   }
 });
 
+
 module.exports = router;
