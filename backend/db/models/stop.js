@@ -49,7 +49,7 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.TEXT,
       allowNull: true
     },
-    days: { // New field
+    days: {
       type: DataTypes.INTEGER,
       allowNull: true,
       validate: {

@@ -15,30 +15,60 @@ module.exports = {
       {
         post_id: 1,
         order: 1,
-        name: 'Beach Stop',
-        location: '123 Coastal Rd',
-        description: 'A scenic stop by the beach.',
-        days: null, // Optional: can set to 1 or leave null
+        name: 'Santa Monica Pier',
+        location: 'Santa Monica, CA',
+        description: 'Enjoying the beach and the famous pier.',
+        days: 3,
+        created_at: new Date(),
+        updated_at: new Date()
+      },
+      {
+        post_id: 1,
+        order: 2,
+        name: 'San Diego Zoo',
+        location: 'San Diego, CA',
+        description: 'Exploring one of the best zoos in the country.',
+        days: 4, // Total 7 days matches Post 1 trip_length
         created_at: new Date(),
         updated_at: new Date()
       },
       {
         post_id: 2,
         order: 1,
-        name: 'Mountain Peak',
-        location: '456 High Trail',
-        description: 'Reached the summit!',
-        days: null,
+        name: 'Rocky Mountain National Park',
+        location: 'Estes Park, CO',
+        description: 'Hiking to a stunning mountain peak.',
+        days: 2,
+        created_at: new Date(),
+        updated_at: new Date()
+      },
+      {
+        post_id: 2,
+        order: 2,
+        name: 'Great Sand Dunes National Park',
+        location: 'Mosca, CO',
+        description: 'Camping among towering sand dunes.',
+        days: 3, // Total 5 days matches Post 2 trip_length
         created_at: new Date(),
         updated_at: new Date()
       },
       {
         post_id: 3,
         order: 1,
-        name: 'City Square',
-        location: '789 Urban St',
-        description: 'Exploring downtown.',
-        days: null,
+        name: 'Museum  of Illusions',
+        location: 'Seattle, WA',
+        description: 'Checking out the historic downtown area.',
+        days: 1,
+        created_at: new Date(),
+        updated_at: new Date()
+      },
+      {
+        post_id: 3,
+        order: 2,
+        name: 'Pike Place Market',
+        location: 'Seattle, WA',
+        description: 'Visiting the famous market and local artisans.',
+        days: 2, // Total 3 days matches Post 3 trip_length
         created_at: new Date(),
         updated_at: new Date()
       }

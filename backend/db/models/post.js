@@ -6,7 +6,7 @@ module.exports = (sequelize, DataTypes) => {
   class Post extends Model {
     static associate(models) {
       Post.belongsTo(models.User, {
-        foreignKey: 'owner_id', // Changed to owner_id
+        foreignKey: 'owner_id',
         as: 'owner'
       });
       Post.hasMany(models.Stop, {
@@ -21,7 +21,7 @@ module.exports = (sequelize, DataTypes) => {
   }
 
   Post.init({
-    owner_id: { // Changed to owner_id
+    owner_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
@@ -44,6 +44,14 @@ module.exports = (sequelize, DataTypes) => {
           args: [['planned', 'completed', 'in_progress']],
           msg: 'Status must be one of: planned, completed, in_progress'
         }
+      }
+    },
+    trip_length: { // Added field
+      type: DataTypes.INTEGER,
+      allowNull: true,
+      validate: {
+        isInt: { msg: 'Trip length must be an integer' },
+        min: { args: [1], msg: 'Trip length must be at least 1' }
       }
     },
     created_at: {

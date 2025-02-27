@@ -1,0 +1,140 @@
+/* src/components/Splash/Splash.css */
+.splash-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 40px 20px;
+    text-align: center;
+    font-family: 'Arial', sans-serif;
+    background-color: #ecf0f1;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+  }
+  
+  .splash-container h1 {
+    color: #2c3e50;
+    font-size: 3em;
+    margin-bottom: 20px;
+  }
+  
+  .splash-container p {
+    color: #555;
+    font-size: 1.2em;
+    margin-bottom: 30px;
+    line-height: 1.6;
+  }
+  
+  .splash-container .cta-button {
+    padding: 12px 30px;
+    background-color: #3498db;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 1.2em;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    text-decoration: none;
+    display: inline-block;
+    margin-bottom: 40px;
+  }
+  
+  .splash-container .cta-button:hover {
+    background-color: #2980b9;
+  }
+  
+  .splash-container h2 {
+    color: #34495e;
+    font-size: 1.8em;
+    margin: 30px 0 20px;
+  }
+  
+  .splash-container .trip-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    padding: 0 10px;
+  }
+  
+  .splash-container .trip-card {
+    position: relative;
+    width: 100%;
+    height: 250px;
+    border-radius: 8px;
+    text-decoration: none;
+    overflow: hidden;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+  }
+  
+  .splash-container .trip-card:hover {
+    transform: scale(1.05);
+  }
+  
+  .splash-container .trip-info {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(0, 0, 0, 0.7);
+    color: white;
+    padding: 10px;
+    text-align: left;
+  }
+  
+  .splash-container .trip-info h3 {
+    margin: 0 0 5px;
+    font-size: 1.2em;
+    color: #ecf0f1;
+  }
+  
+  .splash-container .trip-info p {
+    margin: 0;
+    font-size: 0.9em;
+    color: #bdc3c7;
+  }
+  
+  .splash-container .error {
+    color: #e74c3c;
+    font-size: 1.2em;
+    margin: 20px 0;
+  }
+  
+  /* Responsive Design */
+  @media (max-width: 600px) {
+    .splash-container h1 {
+      font-size: 2em;
+    }
+  
+    .splash-container p {
+      font-size: 1em;
+    }
+  
+    .splash-container .cta-button {
+      font-size: 1em;
+      padding: 10px 20px;
+    }
+  
+    .splash-container h2 {
+      font-size: 1.5em;
+    }
+  
+    .splash-container .trip-grid {
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    }
+  
+    .splash-container .trip-card {
+      height: 200px;
+    }
+  
+    .splash-container .trip-info h3 {
+      font-size: 1em;
+    }
+  
+    .splash-container .trip-info p {
+      font-size: 0.8em;
+    }
+  }

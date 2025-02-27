@@ -22,14 +22,21 @@ export const loadPostsThunk = () => async (dispatch) => {
 };
 
 export const createPostThunk = (postData) => async (dispatch) => {
-  const response = await csrfFetch('/api/posts', {
-    method: 'POST',
-    body: JSON.stringify(postData)
-  });
-  const data = await response.json();
-  dispatch(createPost(data));
-  return data;
-};
+    console.log('Thunk received postData:', postData); // Debug log
+    const response = await csrfFetch('/api/posts', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(postData)
+    });
+    if (response.ok) {
+      const newPost = await response.json();
+      dispatch({ type: 'posts/addPost', payload: newPost });
+      return newPost;
+    } else {
+      const error = await response.json();
+      throw new Error(error.message);
+    }
+  };
 
 const postsReducer = (state = {}, action) => {
   switch (action.type) {

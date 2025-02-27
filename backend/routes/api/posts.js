@@ -43,7 +43,13 @@ router.get('/', async (req, res) => {
       attributes: ['id', 'owner_id', 'body', 'status', 'trip_length', 'created_at', 'updated_at'],
       include: [
         { model: Stop, as: 'stops', attributes: ['id', 'order', 'name', 'location', 'days'] },
-        { model: Review, as: 'reviews', attributes: ['id', 'user_id', 'rating', 'reviews'], include: [{ model: User, as: 'reviewer', attributes: ['username'] }] }
+        { 
+          model: Review, 
+          as: 'reviews', 
+          attributes: ['id', 'user_id', 'rating', 'reviews'],
+          include: [{ model: User, as: 'reviewer', attributes: ['username'] }]
+        },
+        { model: User, as: 'owner', attributes: ['username'] }
       ]
     });
     console.log('Posts fetched:', posts.map(p => p.toJSON()));
@@ -61,11 +67,11 @@ router.post('/', requireAuth, validatePost, async (req, res) => {
 
   try {
     console.log('req.user:', req.user);
-    console.log('req.body:', req.body);
+    console.log('req.body:', JSON.stringify(req.body, null, 2));
     console.log('Received tripLength:', tripLength);
     console.log('Creating post with owner_id:', owner_id);
     if (!owner_id) throw new Error('User ID is not available from req.user');
-    
+
     const postData = {
       owner_id,
       body,
@@ -75,31 +81,33 @@ router.post('/', requireAuth, validatePost, async (req, res) => {
       updated_at: new Date()
     };
     console.log('Post data before create:', postData);
-    
+
     const post = await Post.create(postData);
     console.log('Post saved to DB:', post.toJSON());
-    
+
     if (stops && Array.isArray(stops)) {
-      const stopData = stops.map(stop => ({
+      const stopData = stops.map((stop, index) => ({
         post_id: post.id,
-        order: stop.order,
-        name: stop.name,
-        location: stop.location,
+        order: stop.order !== undefined ? stop.order : index + 1, // Fallback to index-based order
+        name: stop.name || 'Unnamed Stop',
+        location: stop.location || 'Unknown Location',
         description: stop.description || null,
         days: stop.days || null
       }));
-      console.log('Stop data before create:', stopData);
+      console.log('Stop data before create:', JSON.stringify(stopData, null, 2));
       await Stop.bulkCreate(stopData, { validate: true });
       console.log('Stops created:', stopData);
     } else {
       console.log('No stops provided or stops is not an array');
+      throw new Error('Stops array is required');
     }
 
     const createdPost = await Post.findByPk(post.id, {
       attributes: ['id', 'owner_id', 'body', 'status', 'trip_length', 'created_at', 'updated_at'],
       include: [
         { model: Stop, as: 'stops', attributes: ['id', 'order', 'name', 'location', 'days'] },
-        { model: Review, as: 'reviews', attributes: ['id', 'user_id', 'rating', 'reviews'], include: [{ model: User, as: 'reviewer', attributes: ['username'] }] }
+        { model: Review, as: 'reviews', attributes: ['id', 'user_id', 'rating', 'reviews'], include: [{ model: User, as: 'reviewer', attributes: ['username'] }] },
+        { model: User, as: 'owner', attributes: ['username'] }
       ]
     });
     console.log('Post created:', createdPost.toJSON());
@@ -124,7 +132,8 @@ router.get('/:postId', async (req, res) => {
       attributes: ['id', 'owner_id', 'body', 'status', 'trip_length', 'created_at', 'updated_at'],
       include: [
         { model: Stop, as: 'stops', attributes: ['id', 'order', 'name', 'location', 'days'] },
-        { model: Review, as: 'reviews', attributes: ['id', 'user_id', 'rating', 'reviews'], include: [{ model: User, as: 'reviewer', attributes: ['username'] }] }
+        { model: Review, as: 'reviews', attributes: ['id', 'user_id', 'rating', 'reviews'], include: [{ model: User, as: 'reviewer', attributes: ['username'] }] },
+        { model: User, as: 'owner', attributes: ['username'] }
       ]
     });
     if (!post) {
@@ -170,7 +179,7 @@ router.post('/:postId/reviews', requireAuth, validateReview, async (req, res) =>
       updated_at: new Date()
     };
     console.log('Review data before create:', reviewData);
-    
+
     const newReview = await Review.create(reviewData);
     console.log('Review created:', newReview.toJSON());
 
@@ -264,54 +273,63 @@ router.put('/:postId', requireAuth, validatePost, async (req, res) => {
 
   try {
     console.log(`Editing post ${postId} by user ${userId}`);
-    console.log('req.user:', req.user);
-    console.log('Received tripLength:', tripLength);
+    console.log('Received trip data:', JSON.stringify(req.body, null, 2));
     const post = await Post.findByPk(postId);
     if (!post) {
       console.log(`Post ${postId} not found`);
       return res.status(404).json({ message: 'Trip not found' });
     }
-    console.log('Post owner_id:', post.owner_id);
     if (post.owner_id !== userId) {
       console.log(`User ${userId} not authorized to edit post ${postId} owned by ${post.owner_id}`);
       return res.status(403).json({ message: 'You are not authorized to edit this trip' });
     }
 
-    await post.update({ 
-      body, 
-      status, 
-      trip_length: tripLength ? parseInt(tripLength) : null, 
-      updated_at: new Date() 
-    });
+    const updateData = {
+      body,
+      status,
+      trip_length: tripLength ? parseInt(tripLength) : null,
+      updated_at: new Date(),
+    };
+    console.log('Update data for Post:', updateData);
+    await post.update(updateData);
     console.log('Post updated in DB:', post.toJSON());
 
     if (stops && Array.isArray(stops)) {
       await Stop.destroy({ where: { post_id: postId } });
       console.log(`Deleted existing stops for post ${postId}`);
 
-      const stopData = stops.map(stop => ({
+      const stopData = stops.map((stop, index) => ({
         post_id: post.id,
-        order: stop.order,
-        name: stop.name,
-        location: stop.location,
+        order: stop.order !== undefined ? stop.order : index + 1, // Fallback order
+        name: stop.name || 'Unnamed Stop',
+        location: stop.location || 'Unknown Location',
         description: stop.description || null,
-        days: stop.days || null
+        days: stop.days || null,
       }));
+      console.log('Stop data before create:', JSON.stringify(stopData, null, 2));
       await Stop.bulkCreate(stopData, { validate: true });
       console.log('Stops updated:', stopData);
+    } else {
+      console.log('No valid stops array provided, skipping stop update');
     }
 
     const updatedPost = await Post.findByPk(postId, {
       attributes: ['id', 'owner_id', 'body', 'status', 'trip_length', 'created_at', 'updated_at'],
       include: [
         { model: Stop, as: 'stops', attributes: ['id', 'order', 'name', 'location', 'days'] },
-        { model: Review, as: 'reviews', attributes: ['id', 'user_id', 'rating', 'reviews'], include: [{ model: User, as: 'reviewer', attributes: ['username'] }] }
-      ]
+        { model: Review, as: 'reviews', attributes: ['id', 'user_id', 'rating', 'reviews'], include: [{ model: User, as: 'reviewer', attributes: ['username'] }] },
+        { model: User, as: 'owner', attributes: ['username'] },
+      ],
     });
-    console.log('Post updated:', updatedPost.toJSON());
+    console.log('Post updated:', JSON.stringify(updatedPost.toJSON(), null, 2));
     return res.json(updatedPost);
   } catch (err) {
     console.error('Error updating post:', err);
+    if (err.name === 'SequelizeValidationError') {
+      const errors = err.errors.map((e) => ({ field: e.path, message: e.message }));
+      console.log('Validation errors:', errors);
+      return res.status(400).json({ title: 'Validation Error', errors });
+    }
     return res.status(500).json({ title: 'Server Error', message: err.message, stack: err.stack });
   }
 });

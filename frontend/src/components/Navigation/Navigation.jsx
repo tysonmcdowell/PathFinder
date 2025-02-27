@@ -1,11 +1,10 @@
-// frontend/src/components/Navigation.jsx
 import { NavLink } from "react-router-dom";
 import ProfileButton from "./ProfileButton";
 import "./Navigation.css";
 import { useSelector, useDispatch } from "react-redux";
 import { useEffect } from "react";
 import { thunkAuthenticate } from "../../redux/session";
-import { restoreCSRF } from "../../redux/csrf"; // Correct path
+import { restoreCSRF } from "../../redux/csrf";
 
 function Navigation() {
   const dispatch = useDispatch();
@@ -25,19 +24,16 @@ function Navigation() {
   }, [dispatch, user]);
 
   return (
-    <ul>
-      <li>
+    <nav className="nav-container">
+      <NavLink to="/" className="logo">PathFinder</NavLink>
+      <div className="nav-links">
         <NavLink to="/">Home</NavLink>
-      </li>
-      {user && (
-        <li>
-          <NavLink to="/create-trip">Create Trip</NavLink>
-        </li>
-      )}
-      <li>
         <ProfileButton />
-      </li>
-    </ul>
+        {user && (
+          <NavLink to="/create-trip">Create Trip</NavLink>
+        )}
+      </div>
+    </nav>
   );
 }
 

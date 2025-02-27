@@ -1,10 +1,10 @@
-// backend/db/migrations/YYYYMMDDHHMMSS-create-stops.js (your original migration file)
+// backend/db/migrations/YYYYMMDDHHMMSS-create-stops.js
 'use strict';
 
 let options = {};
 options.tableName = 'Stops';
 if (process.env.NODE_ENV === 'production') {
-  options.schema = process.env.SCHEMA; // Define schema in production
+  options.schema = process.env.SCHEMA;
 }
 
 module.exports = {
@@ -41,7 +41,7 @@ module.exports = {
         type: Sequelize.TEXT,
         allowNull: true
       },
-      days: { // New column
+      days: {
         type: Sequelize.INTEGER,
         allowNull: true
       },

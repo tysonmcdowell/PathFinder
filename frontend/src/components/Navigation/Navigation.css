@@ -1,3 +1,73 @@
 .profile-dropdown {
     position: absolute;
+    padding-top: 60px;
+    padding-left: 110px;
 }
+
+/* src/components/Navigation/Navigation.css */
+.nav-container {
+    background-color: #2c3e50;
+    padding: 15px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  }
+  
+  .nav-container .logo {
+    color: white;
+    font-size: 1.5em;
+    font-weight: bold;
+    text-decoration: none;
+  }
+  
+  .nav-container .nav-links {
+    display: flex;
+    gap: 20px;
+  }
+  
+  .nav-container a {
+    color: #ecf0f1;
+    text-decoration: none;
+    font-size: 1.1em;
+    transition: color 0.3s;
+    display: flex;
+    align-items: center; /* Center text vertically */
+    justify-content: center; /* Center text horizontally */
+    height: 40px; /* Adjust as needed */
+    padding: 10px 15px; /* Adds space inside links */
+    border-radius: 4px; /* Optional: adds rounded corners */
+}
+  
+  .nav-container a:hover {
+    color: #3498db;
+  }
+  
+  .nav-container button {
+    padding: 8px 15px;
+    background-color: #3498db;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 1em;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  
+  .nav-container button:hover {
+    background-color: #2980b9;
+  }
+  
+  /* Responsive Design */
+  @media (max-width: 600px) {
+    .nav-container {
+      flex-direction: column;
+      gap: 15px;
+    }
+  
+    .nav-container .nav-links {
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+    }
+  }
