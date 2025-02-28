@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useModal } from '../../context/Modal';
-import * as sessionActions from '../../redux/session'; // Adjust path if needed
-import './LoginForm.css'; // Assume a similar CSS file exists
+import * as sessionActions from '../../redux/session';
+import './LoginForm.css';
 
 function LoginFormModal() {
   const dispatch = useDispatch();
@@ -15,17 +15,21 @@ function LoginFormModal() {
     e.preventDefault();
     setErrors({});
 
-    const loginData = { email: credential, password }; // Match thunkLogin expectations
+    if (/\s/.test(credential)) {
+      return setErrors({ credential: 'Username or email cannot contain spaces' });
+    }
+
+    const loginData = { email: credential, password };
 
     try {
       const response = await dispatch(sessionActions.thunkLogin(loginData));
-      if (!response) { // thunkLogin returns null on success
+      if (!response) { 
         closeModal();
       } else {
-        setErrors(response.errors || { message: 'An error occurred during login' });
+        setErrors({ message: 'Username/Email or password is incorrect' });
       }
     } catch (err) {
-      setErrors({ message: 'An unexpected error occurred' });
+      setErrors({ message: 'Username/Email or password is incorrect' });
       console.error(err);
     }
   };
@@ -33,7 +37,7 @@ function LoginFormModal() {
   const handleDemoLogin = async (e) => {
     e.preventDefault();
     setErrors({});
-    setCredential('demo@user.io'); // Auto-fill demo credentials
+    setCredential('demo@user.io');
     setPassword('password');
 
     const loginData = { email: 'demo@user.io', password: 'password' };
@@ -43,10 +47,10 @@ function LoginFormModal() {
       if (!response) {
         closeModal();
       } else {
-        setErrors(response.errors || { message: 'An error occurred during demo login' });
+        setErrors({ message: 'Demo login failed: Username/Email or password is incorrect' });
       }
     } catch (err) {
-      setErrors({ message: 'An unexpected error occurred' });
+      setErrors({ message: 'Demo login failed: Username/Email or password is incorrect' });
       console.error(err);
     }
   };
@@ -77,7 +81,7 @@ function LoginFormModal() {
         </label>
         {errors.password && <p className="error">{errors.password}</p>}
         <button type="submit">Log In</button>
-        <button type="button" onClick={handleDemoLogin}>Demo Login</button> {/* Added Demo Login button */}
+        <button type="button" onClick={handleDemoLogin}>Demo Login</button>
       </form>
     </div>
   );

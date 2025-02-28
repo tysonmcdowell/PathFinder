@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useModal } from '../../context/Modal';
-import * as sessionActions from '../../redux/session'; // Ensure this path is correct
+import * as sessionActions from '../../redux/session';
 import './SignupForm.css';
 
 function SignupFormModal() {
@@ -17,8 +17,21 @@ function SignupFormModal() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setErrors({});
+
+    if (/\s/.test(email)) {
+      return setErrors({ email: 'Email cannot contain spaces' });
+    }
+    if (/\s/.test(username)) {
+      return setErrors({ username: 'Username cannot contain spaces' });
+    }
+
+    if (!email.includes('@')) {
+      return setErrors({ email: 'Email must contain an @ symbol' });
+    }
+
     if (password !== confirmPassword) {
-      return setErrors({ confirmPassword: 'Confirm Password field must match the Password field' });
+      return setErrors({ message: 'Passwords do not match' });
     }
 
     const signupData = {
@@ -30,14 +43,14 @@ function SignupFormModal() {
     };
 
     try {
-      const response = await dispatch(sessionActions.thunkSignup(signupData)); // Changed from signup to thunkSignup
-      if (!response) { // thunkSignup returns null on success
+      const response = await dispatch(sessionActions.thunkSignup(signupData));
+      if (!response) { 
         closeModal();
       } else {
-        setErrors(response.errors || { message: 'An error occurred during signup' });
+        setErrors(response.errors || { message: 'Signup failed. Please check your input.' });
       }
     } catch (err) {
-      setErrors({ message: 'An unexpected error occurred' });
+      setErrors({ message: 'Signup failed. Please check your input.' });
       console.error(err);
     }
   };
