@@ -38,7 +38,7 @@ function LoginFormModal() {
       {errors.message && <p>{errors.message}</p>}
       <form onSubmit={handleSubmit}>
         <label>
-          Email
+          Username
           <input
             type="text"
             value={email}
