@@ -1,57 +1,34 @@
-let csrfToken = null; // Store token in memory
+import Cookies from 'js-cookie';
 
-export async function csrfFetch(url, options = {}) {
-  options.method = options.method || 'GET';
-  options.headers = options.headers || {};
 
-  // For non-GET requests, add CSRF token if available
-  if (options.method.toUpperCase() !== 'GET') {
-    options.headers['Content-Type'] = options.headers['Content-Type'] || 'application/json';
-    if (csrfToken) {
-      options.headers['XSRF-Token'] = csrfToken;
-    } else {
-      console.warn('CSRF token not available, attempting to fetch');
-      await restoreCSRF(); // Fetch token if not set
-      if (csrfToken) {
-        options.headers['XSRF-Token'] = csrfToken;
-      } else {
-        console.error('CSRF token still not available after restore');
-      }
+export async function csrfFetch(url, options) {
+    // set options.method to 'GET' if there is no method
+    if (options) {
+        options.method = options.method || 'GET';
+        // set options.headers to an empty object if there is no headers
+        options.headers = options.headers || {};
+
+        // if the options.method is not 'GET', then set the "Content-Type" header to
+        // "application/json", and set the "XSRF-TOKEN" header to the value of the
+        // "XSRF-TOKEN" cookie
+        if (options.method.toUpperCase() !== 'GET') {
+            options.headers['Content-Type'] =
+            options.headers['Content-Type'] || 'application/json';
+            options.headers['XSRF-Token'] = Cookies.get('XSRF-TOKEN');
+        }
     }
-  }
-
-  try {
+    // call the default window's fetch with the url and the options passed in
     const res = await window.fetch(url, options);
-    if (res.status >= 400) {
-      const errorData = await res.json();
-      throw new Error(errorData.message || `Request failed with status ${res.status}`);
-    }
+
+    // if the response status code is 400 or above, then throw an error with the
+    // error being the response
+    if (res.status >= 400) throw res;
+
+    // if the response status code is under 400, then return the response to the
+    // next promise chain
     return res;
-  } catch (err) {
-    console.error('csrfFetch error:', err.message);
-    throw err;
-  }
 }
 
-export async function restoreCSRF() {
-  console.log('Fetching CSRF token from /api/csrf/restore');
-  try {
-    const response = await fetch('/api/csrf/restore'); // Use plain fetch to avoid recursion
-    if (!response.ok) {
-      throw new Error(`Failed to fetch CSRF token: ${response.status}`);
-    }
-    // Backend sets cookie, extract it from document.cookie
-    const cookies = document.cookie.split(';').map(cookie => cookie.trim());
-    const xsrfCookie = cookies.find(cookie => cookie.startsWith('XSRF-TOKEN='));
-    if (xsrfCookie) {
-      csrfToken = xsrfCookie.split('=')[1];
-      console.log('CSRF token restored:', csrfToken);
-    } else {
-      console.warn('XSRF-TOKEN cookie not found in response');
-    }
-    return response;
-  } catch (err) {
-    console.error('Failed to restore CSRF:', err.message);
-    throw err;
-  }
+export function restoreCSRF() {
+    return csrfFetch('/api/csrf/restore');
 }
