@@ -44,7 +44,7 @@ function ProfileButton() {
   return (
     <>
       <button onClick={toggleMenu}>
-        Menu
+        Profile
       </button>
       {showMenu && (
         <ul className="profile-dropdown" ref={ulRef}>

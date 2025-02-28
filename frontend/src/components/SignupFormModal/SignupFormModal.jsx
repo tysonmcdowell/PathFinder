@@ -1,3 +1,4 @@
+// frontend/src/components/SignupFormModal/SignupFormModal.jsx
 import { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useModal } from '../../context/Modal';
@@ -19,17 +20,38 @@ function SignupFormModal() {
     e.preventDefault();
     setErrors({});
 
+    // Email validation
     if (/\s/.test(email)) {
       return setErrors({ email: 'Email cannot contain spaces' });
     }
+    if (!email.includes('@') || !email.includes('.') || email.length < 5) {
+      return setErrors({ email: 'Please enter a valid email (e.g., user@domain.com)' });
+    }
+    if (email.length > 255) {
+      return setErrors({ email: 'Email must be 255 characters or less' });
+    }
+
+    // Username validation
     if (/\s/.test(username)) {
       return setErrors({ username: 'Username cannot contain spaces' });
     }
-
-    if (!email.includes('@')) {
-      return setErrors({ email: 'Email must contain an @ symbol' });
+    if (username.length < 4) {
+      return setErrors({ username: 'Username must be at least 4 characters' });
+    }
+    if (username.length > 30) {
+      return setErrors({ username: 'Username must be 30 characters or less' });
+    }
+    if (!/^[a-zA-Z0-9]+$/.test(username)) {
+      return setErrors({ username: 'Username must contain only letters and numbers' });
     }
 
+    // Password validation
+    if (password.length < 6) {
+      return setErrors({ password: 'Password must be at least 6 characters' });
+    }
+    if (password.length > 50) {
+      return setErrors({ password: 'Password must be 50 characters or less' });
+    }
     if (password !== confirmPassword) {
       return setErrors({ message: 'Passwords do not match' });
     }
@@ -44,13 +66,13 @@ function SignupFormModal() {
 
     try {
       const response = await dispatch(sessionActions.thunkSignup(signupData));
-      if (!response) { 
+      if (!response) { // thunkSignup returns null on success
         closeModal();
       } else {
-        setErrors(response.errors || { message: 'Signup failed. Please check your input.' });
+        setErrors(response.errors || { message: 'Signup failed. Email or Username not unique.' });
       }
     } catch (err) {
-      setErrors({ message: 'Signup failed. Please check your input.' });
+      setErrors({ message: 'Signup failed. Email or Username not unique.' });
       console.error(err);
     }
   };

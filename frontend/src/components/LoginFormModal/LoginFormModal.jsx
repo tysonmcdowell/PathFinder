@@ -1,3 +1,4 @@
+// frontend/src/components/LoginFormModal/LoginFormModal.jsx
 import { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useModal } from '../../context/Modal';
@@ -15,18 +16,25 @@ function LoginFormModal() {
     e.preventDefault();
     setErrors({});
 
+    // Credential validation
     if (/\s/.test(credential)) {
       return setErrors({ credential: 'Username or email cannot contain spaces' });
+    }
+    if (credential.length < 4) {
+      return setErrors({ credential: 'Username or email must be at least 4 characters' });
+    }
+    if (credential.length > 255) {
+      return setErrors({ credential: 'Username or email must be 255 characters or less' });
     }
 
     const loginData = { email: credential, password };
 
     try {
       const response = await dispatch(sessionActions.thunkLogin(loginData));
-      if (!response) { 
+      if (!response) {
         closeModal();
       } else {
-        setErrors({ message: 'Username/Email or password is incorrect' });
+        setErrors(response.errors || { message: 'Username/Email or password is incorrect' });
       }
     } catch (err) {
       setErrors({ message: 'Username/Email or password is incorrect' });
