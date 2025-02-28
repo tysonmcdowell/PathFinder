@@ -1,52 +1,71 @@
-import { useState } from "react";
-import { thunkLogin } from "../../redux/session";
-import { useDispatch } from "react-redux";
-import { useModal } from "../../context/Modal";
-import "./LoginForm.css";
+import { useState } from 'react';
+import { useDispatch } from 'react-redux';
+import { useModal } from '../../context/Modal';
+import * as sessionActions from '../../redux/session'; // Adjust path if needed
+import './LoginForm.css'; // Assume a similar CSS file exists
 
 function LoginFormModal() {
   const dispatch = useDispatch();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [credential, setCredential] = useState('');
+  const [password, setPassword] = useState('');
   const [errors, setErrors] = useState({});
   const { closeModal } = useModal();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Submitting login:', { email, password });
+    setErrors({});
 
-    const serverResponse = await dispatch(
-      thunkLogin({
-        email,
-        password,
-      })
-    );
+    const loginData = { email: credential, password }; // Match thunkLogin expectations
 
-    if (serverResponse) {
-      console.log('Login failed:', serverResponse);
-      setErrors(serverResponse);
-    } else {
-      console.log('Login succeeded, closing modal');
-      closeModal();
-      console.log('Modal closed');
+    try {
+      const response = await dispatch(sessionActions.thunkLogin(loginData));
+      if (!response) { // thunkLogin returns null on success
+        closeModal();
+      } else {
+        setErrors(response.errors || { message: 'An error occurred during login' });
+      }
+    } catch (err) {
+      setErrors({ message: 'An unexpected error occurred' });
+      console.error(err);
+    }
+  };
+
+  const handleDemoLogin = async (e) => {
+    e.preventDefault();
+    setErrors({});
+    setCredential('demo@user.io'); // Auto-fill demo credentials
+    setPassword('password');
+
+    const loginData = { email: 'demo@user.io', password: 'password' };
+
+    try {
+      const response = await dispatch(sessionActions.thunkLogin(loginData));
+      if (!response) {
+        closeModal();
+      } else {
+        setErrors(response.errors || { message: 'An error occurred during demo login' });
+      }
+    } catch (err) {
+      setErrors({ message: 'An unexpected error occurred' });
+      console.error(err);
     }
   };
 
   return (
     <div className="login-modal">
       <h1>Log In</h1>
-      {errors.message && <p>{errors.message}</p>}
+      {errors.message && <p className="error">{errors.message}</p>}
       <form onSubmit={handleSubmit}>
         <label>
-          Username
+          Email or Username
           <input
             type="text"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            value={credential}
+            onChange={(e) => setCredential(e.target.value)}
             required
           />
         </label>
-        {errors.email && <p>{errors.email}</p>}
+        {errors.credential && <p className="error">{errors.credential}</p>}
         <label>
           Password
           <input
@@ -56,8 +75,9 @@ function LoginFormModal() {
             required
           />
         </label>
-        {errors.password && <p>{errors.password}</p>}
+        {errors.password && <p className="error">{errors.password}</p>}
         <button type="submit">Log In</button>
+        <button type="button" onClick={handleDemoLogin}>Demo Login</button> {/* Added Demo Login button */}
       </form>
     </div>
   );
